@@ -6,9 +6,8 @@ const connectionString = process.env.DATABASE_URL || "postgresql://postgres:post
 const client = postgres(connectionString, { 
   prepare: false, 
   max: 1,
-  connect_timeout: 10, // 10 sec mein connect nahi hua toh error dega (hang nahi hoga)
-  idle_timeout: 20,
-  max_pipeline: 0 // Query pipelining band karein (yeh hang hone se bachata hai)
+  connect_timeout: 15, 
+  idle_timeout: 20 
 });
 
 export const db = drizzle(client);
