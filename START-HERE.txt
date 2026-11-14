@@ -1,0 +1,18 @@
+Ankit Traders Billing — full source code
+
+Deploy on Vercel:
+  1) Create a repository and push this folder, or upload it via GitHub "Add file → Upload files".
+  2) Create a free PostgreSQL database (Neon / Supabase / Railway / Vercel Postgres).
+  3) Import the repo at https://vercel.com/new, framework preset "Next.js".
+  4) Add environment variable DATABASE_URL with your Postgres connection string.
+  5) Deploy, then run "npx drizzle-kit push" once against that DATABASE_URL to create tables.
+
+Included fixes:
+  * Print: @page { size: A5 portrait; margin: 10mm }
+  * PDF / JPG: exact A5 (148 x 210 mm), html2canvas scale: 3 (~300 DPI, JPEG 0.96)
+  * Everything else unchanged (design, entries, 5 tabs, 48-month archive, reports)
+
+Need a no-server version? See public/ankit-traders-billing.html (single-file offline app)
+or run "node scripts/build-standalone.mjs" to rebuild it.
+
+Full instructions: README.md and DEPLOY.md

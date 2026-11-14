@@ -1,0 +1,295 @@
+@import "tailwindcss";
+@import "./app-theme.css";
+@import "./a5-print.css";
+
+:root {
+  --font-display: var(--font-playfair), "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-jakarta), "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--canvas, #f5f7f3);
+  color: var(--ink, #17251e);
+}
+
+.toast-error {
+  color: #7d3b30;
+  border-color: #eecfca;
+  background: #fff6f4;
+}
+
+/* the on-screen A5 preview keeps the memo centred without clipping on mobile */
+.a5-preview-frame .invoice-paper {
+  width: 100%;
+}
+
+.a5-preview-frame .invoice-paper.a5-paper {
+  width: 148mm !important;
+}
+
+/* single-file offline app download (sidebar) */
+.standalone-download {
+  width: 100%;
+  justify-content: center;
+  min-height: 36px;
+  margin-top: 12px;
+  font-size: 11.5px;
+  text-decoration: none;
+}
+
+.sidebar-note-sub {
+  margin: 6px 0 0;
+  font-size: 10px;
+  line-height: 1.45;
+  color: #9db3a5;
+}
+
+.standalone-actions {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.standalone-actions .secondary-button {
+  width: 100%;
+  justify-content: center;
+  min-height: 34px;
+  font-size: 11.5px;
+}
+
+.file-pick {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.file-pick input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ------------------------- /download landing page ------------------------ */
+.download-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 44px 22px 64px;
+  display: grid;
+  gap: 20px;
+}
+
+.download-hero {
+  background: linear-gradient(140deg, #173d30 0%, #123126 60%, #1c4a37 100%);
+  color: #f4faf2;
+  border-radius: 22px;
+  padding: 38px 34px;
+  box-shadow: 0 22px 60px #173d2b30;
+}
+
+.download-hero .topbar-eyebrow {
+  color: #d8c27a;
+  margin: 0 0 10px;
+}
+
+.download-hero h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  line-height: 1.15;
+  margin: 0 0 14px;
+}
+
+.download-hero p {
+  color: #d5e4d8;
+  line-height: 1.65;
+  font-size: 0.95rem;
+  margin: 0;
+  max-width: 68ch;
+}
+
+.download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 12px;
+}
+
+.download-cta {
+  text-decoration: none;
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  background: #d9ee9c;
+  color: #173d30;
+  font-weight: 800;
+  box-shadow: 0 10px 24px #0c241933;
+}
+
+.download-actions .secondary-button {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 18px;
+  background: #ffffff14;
+  color: #eef7ea;
+  border: 1px solid #ffffff33;
+}
+
+.download-hint {
+  font-size: 0.82rem !important;
+  color: #b7cbb9 !important;
+}
+
+.download-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.download-card {
+  padding: 24px;
+}
+
+.download-card h2 {
+  margin: 0 0 14px;
+  font-size: 1.05rem;
+  color: #1d3a2a;
+}
+
+.download-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.download-card ul li {
+  border-left: 3px solid #cfe0c5;
+  padding-left: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.download-card ul strong {
+  font-size: 0.9rem;
+  color: #234932;
+}
+
+.download-card ul span,
+.download-card p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #5c6b60;
+}
+
+.download-hosts {
+  display: grid;
+  gap: 16px;
+}
+
+.download-hosts strong {
+  font-size: 0.9rem;
+  color: #234932;
+}
+
+.download-hosts ol {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.download-hosts li {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #5c6b60;
+}
+
+@media (max-width: 640px) {
+  .download-hero {
+    padding: 26px 20px;
+  }
+  .download-page {
+    padding: 22px 14px 44px;
+  }
+}
+
+.download-fixes {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.download-fixes strong {
+  color: #234932;
+  font-size: 0.9rem;
+}
+
+.download-fixes p {
+  color: #5c6b60;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  margin: 5px 0 0;
+}
+
+.download-card code {
+  background: #eef3ea;
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-size: 0.8em;
+  color: #2c5238;
+}
+
+/* ------------------------- /source file browser ------------------------- */
+.source-groups {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.source-groups h3 {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6a7a6d;
+}
+
+.source-groups ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.source-groups li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #edf0ec;
+  border-radius: 8px;
+  padding: 6px 9px;
+}
+
+.source-groups code {
+  font-size: 0.72rem;
+  color: #2c5238;
+  overflow-wrap: anywhere;
+}
+
+.source-groups li span {
+  display: inline-flex;
+  gap: 10px;
+  flex: none;
+  font-size: 0.72rem;
+}

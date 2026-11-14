@@ -1,0 +1,17 @@
+{
+  "name": "Ankit Traders Billing",
+  "short_name": "Ankit Billing",
+  "description": "Ankit Traders herbal products billing, A5 PDF/JPG invoices, market collection ledger, and 48-month reports.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f7f3",
+  "theme_color": "#173d30",
+  "icons": [
+    {
+      "src": "/images/ankit-traders-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

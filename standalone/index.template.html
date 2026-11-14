@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ankit Traders Billing — Herbal Products Invoice &amp; Market Collection</title>
+<meta name="description" content="Doctor-wise herbal products billing, A5 PDF/JPG invoices, daily market collection ledger, back dues, and 48-month reports for Ankit Traders." />
+<meta name="theme-color" content="#173d30" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>/*__CSS__*/</style>
+</head>
+<body>
+  <div class="app-shell" id="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <img alt="Ankit Traders" class="brand-logo" src="__LOGO_SRC__" />
+        <div>
+          <p class="brand-name">Ankit Traders</p>
+          <p class="brand-caption">Herbal Products Billing</p>
+        </div>
+      </div>
+      <p class="sidebar-label">Workspace</p>
+      <nav class="sidebar-nav" id="nav" aria-label="Main navigation"></nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="sidebar-note-icon">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/></svg>
+          </span>
+          <strong>Your Data, Always Secure</strong>
+          <p>Single-file offline app — entries are stored in this browser (localStorage) with instant A5 PDF &amp; JPG export. Use the backup buttons to move data to another device.</p>
+        </div>
+        <div class="standalone-actions">
+          <button type="button" class="secondary-button" onclick="App.saveSelfFile()">⬇ Save app file</button>
+          <button type="button" class="secondary-button" onclick="App.backupData()">Backup JSON</button>
+          <label class="secondary-button file-pick">
+            Restore JSON
+            <input type="file" accept="application/json" onchange="App.restoreData(this)" />
+          </label>
+        </div>
+        <div class="sidebar-footer"><span>●</span> Ready to Bill · Ankit Traders</div>
+      </div>
+    </aside>
+
+    <div class="main-panel">
+      <header class="topbar">
+        <div class="topbar-copy">
+          <p class="topbar-eyebrow" id="topbar-eyebrow"></p>
+          <h1 id="topbar-title"></h1>
+          <p class="topbar-subtitle" id="topbar-subtitle"></p>
+        </div>
+        <div class="topbar-actions" id="topbar-actions"></div>
+      </header>
+      <main class="content-wrap" id="main"></main>
+    </div>
+  </div>
+
+  <div class="print-only-sheet" id="print-sheet" aria-hidden="true"></div>
+  <div id="modal-root"></div>
+  <div id="toast-root"></div>
+  <div id="busy-root"></div>
+
+  <!-- html2canvas-pro (A5 @ scale 3) and jsPDF are inlined: the app works fully offline, no CDN -->
+  <script>/*__LIB_H2C__*/</script>
+  <script>/*__LIB_JSPDF__*/</script>
+  <script>window.__ANKIT_SEED__ = __SEED_JSON__;window.__ANKIT_LOGO__ = "__LOGO_SRC__";</script>
+  <script>/*__JS__*/</script>
+</body>
+</html>
