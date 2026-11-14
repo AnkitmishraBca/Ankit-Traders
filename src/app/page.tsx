@@ -11,18 +11,32 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const [minimumMonth, doctors, medicines, invoices] = await Promise.all([
-    getMinimumMonth(),
-    listDoctors(),
-    listMedicines(),
-    listInvoices(),
-  ]);
-  const [collections, reports] = await Promise.all([
-    getCollectionsPayload(),
-    getReportsPayload(),
-  ]);
+async function DataLoader() {
+  const [minimumMonth, doctors, medicines, invoices, collections, reports] =
+    await Promise.all([
+      getMinimumMonth(),
+      listDoctors(),
+      listMedicines(),
+      listInvoices(),
+      getCollectionsPayload(),
+      getReportsPayload(),
+    ]);
 
+  return (
+    <BillingWorkspace
+      initial={{
+        doctors,
+        medicines,
+        invoices,
+        collections,
+        reports,
+        minimumMonth,
+      }}
+    />
+  );
+}
+
+export default function HomePage() {
   return (
     <Suspense
       fallback={
@@ -33,7 +47,7 @@ export default async function HomePage() {
         </div>
       }
     >
-      <BillingWorkspace initial={{ doctors, medicines, invoices, collections, reports, minimumMonth }} />
+      <DataLoader />
     </Suspense>
   );
 }
