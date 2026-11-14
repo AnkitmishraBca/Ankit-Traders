@@ -1,24 +1,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const databaseUrl = process.env.DATABASE_URL!;
+const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@127.0.0.1:5432/app_db";
+const client = postgres(connectionString, { prepare: false, max: 1 });
 
-const globalForDb = globalThis as typeof globalThis & {
-  __arenaNextJsPostgresClient?: ReturnType<typeof postgres>;
-};
-
-export const sqlClient =
-  globalForDb.__arenaNextJsPostgresClient ??
-  postgres(databaseUrl, {
-    prepare: false, 
-    max: 1, 
-    idle_timeout: 10, 
-    connect_timeout: 10, 
-    max_pipeline: 0, 
-  });
-
-if (process.env.NODE_ENV !== "production") {
-  globalForDb.__arenaNextJsPostgresClient = sqlClient;
-}
-
-export const db = drizzle(sqlClient);
+export const db = drizzle(client);
