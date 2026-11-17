@@ -1,25 +1,17 @@
 import html2canvas from "html2canvas-pro";
 import { jsPDF } from "jspdf";
 
-/**
- * A5 export engine — Ankit Traders
- * ---------------------------------------------------------------------------
- * Every invoice / market-collection sheet is exported at EXACT A5 size
- * (148mm x 210mm) and rendered at 300 DPI so the print, PDF and JPG output is
- * sharp (text is never faded / blurry), on screen as well as on paper.
- */
-
 export const A5 = {
   widthMm: 148,
   heightMm: 210,
-  widthPx: 559, // 148mm @96dpi
-  heightPx: 794, // 210mm @96dpi
+  widthPx: 559,
+  heightPx: 794,
   dpi: 300,
 } as const;
 
 export const A5_PX_300DPI = {
-  width: Math.round((A5.widthMm / 25.4) * A5.dpi), // 1748
-  height: Math.round((A5.heightMm / 25.4) * A5.dpi), // 2480
+  width: Math.round((A5.widthMm / 25.4) * A5.dpi),
+  height: Math.round((A5.heightMm / 25.4) * A5.dpi),
 };
 
 const MAX_CANVAS_SIDE = 8000;
@@ -34,7 +26,9 @@ async function settle(root?: HTMLElement | null) {
     /* font loading is best-effort */
   }
   if (root) await decodeImages(root);
-  await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  await new Promise<void>((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
   await new Promise((resolve) => setTimeout(resolve, 90));
 }
 
@@ -56,11 +50,100 @@ async function decodeImages(root: HTMLElement) {
   );
 }
 
-/**
- * Renders any memo node into a 300 DPI canvas with an exact A5 width.
- * The node is cloned into an off-screen stage that is 148mm wide, so the
- * output never depends on the visitor's screen size.
- */
+function paintCoverSquare(img: HTMLImageElement, size = 360): HTMLCanvasElement | null {
+  const iw = img.naturalWidth;
+  const ih = img.naturalHeight;
+  if (!iw || !ih) return null;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, size, size);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const side = Math.min(iw, ih);
+  const sx = (iw - side) / 2;
+  const sy = (ih - side) / 2;
+  ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+  ctx.getImageData(0, 0, 1, 1);
+  return canvas;
+}
+
+async function rasterizeImage(
+  sourceImg: HTMLImageElement | undefined,
+  rawSrc: string,
+): Promise<HTMLCanvasElement | null> {
+  if (sourceImg && sourceImg.complete && sourceImg.naturalWidth > 0) {
+    try {
+      const direct = paintCoverSquare(sourceImg);
+      if (direct) return direct;
+    } catch {
+      /* fall through to fetch */
+    }
+  }
+
+  if (!rawSrc || typeof window === "undefined") return null;
+  const absoluteUrl =
+    rawSrc.startsWith("data:") || rawSrc.startsWith("blob:") || rawSrc.startsWith("http")
+      ? rawSrc
+      : new URL(rawSrc, window.location.origin).href;
+
+  try {
+    const response = await fetch(absoluteUrl, { cache: "force-cache" });
+    if (response.ok) {
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      try {
+        const loaded = await new Promise<HTMLImageElement | null>((resolve) => {
+          const el = new Image();
+          const timer = setTimeout(() => resolve(null), 5000);
+          el.onload = () => {
+            clearTimeout(timer);
+            resolve(el);
+          };
+          el.onerror = () => {
+            clearTimeout(timer);
+            resolve(null);
+          };
+          el.src = objectUrl;
+        });
+        if (loaded) {
+          const painted = paintCoverSquare(loaded);
+          if (painted) return painted;
+        }
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+  } catch {
+    /* fall through to standard Image load */
+  }
+
+  return new Promise((resolve) => {
+    const el = new Image();
+    el.crossOrigin = "anonymous";
+    const timer = setTimeout(() => resolve(null), 5000);
+    el.onload = () => {
+      clearTimeout(timer);
+      try {
+        resolve(paintCoverSquare(el));
+      } catch {
+        resolve(null);
+      }
+    };
+    el.onerror = () => {
+      clearTimeout(timer);
+      resolve(null);
+    };
+    el.src = absoluteUrl;
+  });
+}
+
 export async function renderA5Canvas(source: HTMLElement): Promise<HTMLCanvasElement> {
   if (!source) throw new Error("Nothing to export yet");
 
@@ -81,6 +164,25 @@ export async function renderA5Canvas(source: HTMLElement): Promise<HTMLCanvasEle
   clone.style.visibility = "visible";
   clone.style.position = "static";
 
+  const preparedCanvases = new Map<string, HTMLCanvasElement>();
+  const sourceImgs = Array.from(source.querySelectorAll("img"));
+  const cloneImgs = Array.from(clone.querySelectorAll("img"));
+
+  await Promise.all(
+    cloneImgs.map(async (cloneImg, idx) => {
+      const sourceImg = sourceImgs[idx];
+      const rawSrc =
+        cloneImg.getAttribute("src") || sourceImg?.currentSrc || sourceImg?.src || "";
+      const painted = await rasterizeImage(sourceImg, rawSrc);
+      if (!painted) return;
+      const id = String(idx);
+      painted.className = cloneImg.className;
+      painted.setAttribute("data-export-img", id);
+      preparedCanvases.set(id, painted);
+      cloneImg.replaceWith(painted);
+    }),
+  );
+
   stage.appendChild(clone);
   document.body.appendChild(stage);
 
@@ -90,8 +192,6 @@ export async function renderA5Canvas(source: HTMLElement): Promise<HTMLCanvasEle
     const bounds = clone.getBoundingClientRect();
     const baseWidth = Math.max(bounds.width || A5.widthPx, 100);
     const baseHeight = Math.max(bounds.height || A5.heightPx, 100);
-
-    // High quality export: html2canvas scale 3 (≈300 DPI on A5).
     const scale = baseHeight * 3 > MAX_CANVAS_SIDE ? MAX_CANVAS_SIDE / baseHeight : 3;
 
     const canvas = await html2canvas(clone, {
@@ -99,7 +199,7 @@ export async function renderA5Canvas(source: HTMLElement): Promise<HTMLCanvasEle
       backgroundColor: "#ffffff",
       logging: false,
       useCORS: true,
-      imageTimeout: 0,
+      imageTimeout: 15000,
       imageSmoothing: true,
       imageSmoothingQuality: "high",
       x: 0,
@@ -113,6 +213,20 @@ export async function renderA5Canvas(source: HTMLElement): Promise<HTMLCanvasEle
       onclone: (_doc, element) => {
         element.style.transform = "none";
         element.style.boxShadow = "none";
+        const clonedCanvases = Array.from(
+          element.querySelectorAll<HTMLCanvasElement>("canvas[data-export-img]"),
+        );
+        for (const target of clonedCanvases) {
+          const id = target.getAttribute("data-export-img");
+          const srcCanvas = id ? preparedCanvases.get(id) : undefined;
+          if (!srcCanvas) continue;
+          target.width = srcCanvas.width;
+          target.height = srcCanvas.height;
+          const tctx = target.getContext("2d");
+          if (tctx) {
+            tctx.drawImage(srcCanvas, 0, 0);
+          }
+        }
       },
     });
 
@@ -147,7 +261,6 @@ function triggerDownload(href: string, filename: string) {
   link.remove();
 }
 
-/** A5 PDF (300 DPI). Long sheets automatically continue on extra A5 pages. */
 export async function exportA5Pdf(source: HTMLElement, filename: string): Promise<void> {
   const canvas = flatten(await renderA5Canvas(source));
   const pageHeightPx = Math.round((canvas.width / A5.widthMm) * A5.heightMm);
@@ -186,18 +299,12 @@ export async function exportA5Pdf(source: HTMLElement, filename: string): Promis
   pdf.save(filename.endsWith(".pdf") ? filename : `${filename}.pdf`);
 }
 
-/** A5 JPG (300 DPI = 1748px wide) — crisp, never faded. */
 export async function exportA5Jpg(source: HTMLElement, filename: string): Promise<void> {
   const canvas = flatten(await renderA5Canvas(source));
   const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
   triggerDownload(dataUrl, filename.endsWith(".jpg") ? filename : `${filename}.jpg`);
 }
 
-/**
- * Prints the on-page A5 print sheet (`.print-only-sheet`).
- * `@page { size: A5 portrait; margin: 0 }` (see a5-print.css) makes the browser
- * pick A5 paper with borderless output and keeps all colours solid.
- */
 export async function printA5Sheet(title: string): Promise<void> {
   const sheet = document.querySelector<HTMLElement>(".print-only-sheet");
   if (!sheet || !sheet.innerHTML.trim()) throw new Error("Sheet is not ready yet");
@@ -234,7 +341,6 @@ export async function printA5Sheet(title: string): Promise<void> {
   }
 }
 
-/** Fallback for browsers that block window.print() (older iOS / in-app browsers). */
 function printViaPopup(sheet: HTMLElement, title: string): boolean {
   const win = window.open("", "_blank", "width=820,height=980");
   if (!win) return false;
@@ -252,7 +358,7 @@ function printViaPopup(sheet: HTMLElement, title: string): boolean {
       `.print-only-sheet{display:block!important;width:148mm!important;max-width:148mm!important;margin:0!important;padding:0!important}` +
       `.print-only-sheet .invoice-paper{width:148mm!important;min-height:210mm;border:0!important;box-shadow:none!important;border-radius:0!important}` +
       `</style></head><body><div class="print-only-sheet">${sheet.innerHTML}</div>` +
-      `<script>window.onload=function(){setTimeout(function(){window.focus();window.print();},600);};<\/script>` +
+      `<script>window.onload=function(){setTimeout(function(){window.focus();window.print();},600);};</script>` +
       `</body></html>`,
   );
   win.document.close();
