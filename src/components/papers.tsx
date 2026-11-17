@@ -52,7 +52,13 @@ function BrandRow({
   return (
     <div className="paper-brand-row">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img alt="Ankit Traders logo" className="paper-logo" src="/images/ankit-traders-logo.jpg" />
+      <img
+        alt="Ankit Traders logo"
+        className="paper-logo"
+        src="/images/ankit-traders-logo.jpg"
+        loading="eager"
+        decoding="sync"
+      />
       <div className="paper-brand-text">
         <h2 className="paper-company-title">ANKIT TRADERS</h2>
         <p className="paper-company-sub">HERBAL PRODUCTS</p>
@@ -95,7 +101,6 @@ function PaperFooter() {
   return (
     <div className="paper-footer premium-footer">
       <span>Thank you! Visit again.</span>
-      <span>Ankit Traders · Barkagoan Mansingh Patti</span>
     </div>
   );
 }
@@ -137,6 +142,12 @@ export function InvoicePaper({
   paperRef,
   ariaLabel = "Cash Memo preview",
 }: PaperProps & { memo: InvoiceMemo }) {
+  const cleanLines: MemoLine[] = memo.lines.map((line) => ({
+    key: line.key,
+    title: line.title,
+    amount: line.amount,
+  }));
+
   return (
     <PaperShell
       a5={a5}
@@ -164,7 +175,7 @@ export function InvoicePaper({
       </div>
 
       <Lines
-        lines={memo.lines}
+        lines={cleanLines}
         emptyText={
           memo.emptyText ?? "Select medicines and quantities (1–300) to add them to this Cash Memo"
         }
