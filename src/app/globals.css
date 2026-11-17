@@ -293,3 +293,54 @@ body {
   flex: none;
   font-size: 0.72rem;
 }
+/* ---- Mobile fix: show Print Cash Memo, JPG & PDF buttons clearly in Invoice History ---- */
+.modal-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .invoice-modal {
+    max-height: 92dvh;
+  }
+
+  .modal-header {
+    padding: 14px 16px;
+  }
+
+  .modal-body {
+    padding: 14px;
+  }
+
+  .modal-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+    width: 100%;
+  }
+
+  .modal-actions .download-button,
+  .modal-actions .primary-button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 13px;
+    justify-content: center;
+  }
+
+  .preview-card .export-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .preview-card .export-actions .download-button {
+    width: 100%;
+    min-height: 44px;
+    font-size: 13px;
+    justify-content: center;
+  }
+}
