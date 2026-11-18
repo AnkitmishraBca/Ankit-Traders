@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import CatalogueView, { CatalogueBookIcon } from "@/components/CatalogueView";
 import CreateInvoiceView, {
   lineTotals,
   type InvoiceLineState,
@@ -88,6 +89,13 @@ const TAB_META: Record<
     subtitle:
       "Record daily collections using date and doctor dropdowns, inspect any month up to 48 months, and export A5 PDF or JPG statements.",
   },
+  catalogue: {
+    label: "Catalogue",
+    eyebrow: "SB Herbals · Complete Product Catalogue",
+    title: "Product Catalogue",
+    subtitle:
+      "Search any herbal product, disease, or category instantly — or scroll through all 42 HD catalogue pages.",
+  },
   masters: {
     label: "Doctors & Medicines",
     eyebrow: "Master Catalog · Configure Once, Bill Effortlessly",
@@ -111,6 +119,7 @@ const TAB_META: Record<
 const NAV_ICONS: Record<TabKey, React.ReactNode> = {
   invoice: <ReceiptIcon />,
   collection: <WalletIcon />,
+  catalogue: <CatalogueBookIcon />,
   masters: <UsersIcon />,
   history: <ClockIcon />,
   reports: <CalendarIcon />,
@@ -865,6 +874,8 @@ export default function BillingWorkspace({ initial }: { initial: InitialData }) 
                 onAddDoctor={() => setTab("masters")}
               />
             ) : null}
+
+            {tab === "catalogue" ? <CatalogueView onNotify={notify} /> : null}
 
             {tab === "masters" ? (
               <MastersView

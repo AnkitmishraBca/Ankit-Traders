@@ -117,4 +117,4 @@ export type ReportsResponse = {
   dateInvoices: InvoiceRow[];
 };
 
-export type TabKey = "invoice" | "collection" | "masters" | "history" | "reports";
+export type TabKey = "invoice" | "collection" | "catalogue" | "masters" | "history" | "reports";
